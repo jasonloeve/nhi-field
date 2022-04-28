@@ -2,6 +2,13 @@
     "name": "jasonloeve/nhi-field",
     "description": "Provide a NHI db field and NHI Form field to track NZ's \"National Health Index\" number.",
     "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "form",
+        "field",
+        "NHI field validation",
+        "New Zealand National Health Index validation"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -10,11 +17,13 @@
         },
         {
             "name": "Jason Loeve",
-            "email": "jason@weareonfire.co.nz"
+            "email": "jason@weareonfire.co.nz",
+            "role": "Fullstack Developer"
         }
     ],
     "require": {
-        "silverstripe/framework": "^4.0"
+        "silverstripe/cms": "^4.0@dev",
+        "silverstripe/vendor-plugin": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7",

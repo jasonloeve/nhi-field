@@ -75,7 +75,7 @@ class NHIField extends TextField
      * @param string $value
      * @return NHIField
      */
-    public function setValue($value)
+    public function setValue($value, $data = NULL)
     {
         // Always convert the value to uppercase.
         return parent::setValue(strtoupper($value));

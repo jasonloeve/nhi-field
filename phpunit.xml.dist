@@ -1,5 +1,5 @@
 <phpunit bootstrap="vendor/silverstripe/cms/tests/bootstrap.php" colors="true">
-    <testsuite name="jasonloeve/silverstripe-nhi-field">
+    <testsuite name="jasonloeve/nhi-field">
         <directory>tests/</directory>
     </testsuite>
     <filter>

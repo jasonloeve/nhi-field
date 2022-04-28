@@ -1,4 +1,4 @@
-# silverstripe-nhi-field
+# nhi-field
 A Silverstipe module to provide a NHI db field and NHI Form field to track NZ's "National Health Index" number.
 
 [![Build Status](https://travis-ci.org/webtorque/silverstripe-nhi-field.svg?branch=dev)](https://travis-ci.org/webtorque/silverstripe-nhi-field)

@@ -1,5 +1,5 @@
 {
-    "name": "jasonloeve/nhi_field",
+    "name": "jasonloeve/nhi-field",
     "description": "Provide a NHI db field and NHI Form field to track NZ's \"National Health Index\" number.",
     "type": "silverstripe-vendormodule",
     "license": "MIT",
@@ -21,14 +21,7 @@
         "phpunit/phpunit": "^5.7",
         "squizlabs/php_codesniffer": "^3.0"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.x-dev"
-        },
-        "expose": [
-            "client/dist"
-        ]
-    },
+    "extra": {},
     "minimum-stability": "dev",
     "prefer-stable": true
 }

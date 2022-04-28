@@ -100,7 +100,7 @@ class NHIField extends TextField
                 $this->name,
                 _t(
                     'NHIField.VALIDATEPATTERN',
-                    'The value for {name} must be a sequence of 3 letters followed by 4 digits.',
+                    'The value for {name} must be a sequence of 3 letters followed by 2 digits then 2 more letters.',
                     array('name' => $this->Title())
                 ),
                 "validation"
@@ -139,7 +139,6 @@ class NHIField extends TextField
         // Step 10 - Apply modulus 24 to create a checksum.
         $divisor = 24;
         $rest = fmod($sum, $divisor);
-        $outcome = $sum / $divisor;
 
         // Step 11 - If checksum is zero then the NHI number is incorrect
         if ($rest == 0) {
@@ -171,7 +170,7 @@ class NHIField extends TextField
 //            $check_digit = 0;
 //        }
 
-        // Step 14 - Fourth number must be equal to check digit
+        // Step 13 - Fourth number must be equal to check digit
         if ($last_digit != $check_digit) {
             $validator->validationError(
                 $this->name,

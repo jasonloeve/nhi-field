@@ -30,7 +30,7 @@ class LegacyNHIField extends TextField
      * @param Form   $form          Form to add the field to.
      * @param bool   $html5pattern  Output a pattern attribute on the input.
      */
-    public function __construct($name, $title = null, $value = '', $form = null, $html5pattern=false)
+    public function __construct($name, $title = null, $value = '', $form = null, $html5pattern = false)
     {
         parent::__construct($name, $title, $value, 7, $form);
         $this->setHtml5Pattern($html5pattern);
@@ -130,7 +130,6 @@ class LegacyNHIField extends TextField
         $calc5 = $chars[4]*3;
 
         // Step 8 - Multiply third number by 2
-
         $calc6 = $chars[5]*2;
 
         // Step 9 - Total the result of steps 3 to 8
@@ -139,7 +138,6 @@ class LegacyNHIField extends TextField
         // Step 10 - Apply modulus 11 to create a checksum.
         $divisor = 11;
         $rest = fmod($sum, $divisor);
-        $outcome = $sum / $divisor;
 
         // Step 11 - If checksum is zero then the NHI number is incorrect
         if ($rest == 0) {
@@ -157,7 +155,7 @@ class LegacyNHIField extends TextField
 
 
         // Step 12 - Subtract checksum from 11 to create check digit
-        $check_digit = $divisor-$rest;
+        $check_digit = $divisor - $rest;
 
         // Step 13 - If check digit equals 10 convert to zero
         if ($check_digit == 10) {

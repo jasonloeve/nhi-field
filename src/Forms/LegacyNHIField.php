@@ -10,15 +10,14 @@ use SilverStripe\Forms\TextField;
  *
  * Validation is based on the sample code at
  * {@link https://en.wikipedia.org/w/index.php?title=NHI_Number&oldid=770434870}
- * {@link https://www.health.govt.nz/system/files/documents/publications/hiso_10046-2021_consumer_health_identity_standard_20210721_final2-jr.pdf}
  */
-class NHIField extends TextField
+class LegacyNHIField extends TextField
 {
     /**
      * Regular expression to validate an NHI.
      * @var string
      */
-    const REGEX_PATTERN = '^[a-zA-Z]{3}[0-9]{2}[a-zA-Z]{2}$'; // Regex pattern to follow July 2022 standards
+    const REGEX_PATTERN = '^[a-zA-Z]{3}[0-9]{4}$';
 
     // Make sure we apply the text class to the field, so it displays like a normal text field in the CMS.
     private static $default_classes = array('nhi', 'text');
@@ -131,13 +130,14 @@ class NHIField extends TextField
         $calc5 = $chars[4]*3;
 
         // Step 8 - Multiply third number by 2
-        $calc6 = $this->extractLetter($chars[5])*2;
+
+        $calc6 = $chars[5]*2;
 
         // Step 9 - Total the result of steps 3 to 8
         $sum = $calc1 + $calc2 + $calc3 + $calc4 + $calc5 + $calc6;
 
-        // Step 10 - Apply modulus 24 to create a checksum.
-        $divisor = 24;
+        // Step 10 - Apply modulus 11 to create a checksum.
+        $divisor = 11;
         $rest = fmod($sum, $divisor);
         $outcome = $sum / $divisor;
 
@@ -155,24 +155,17 @@ class NHIField extends TextField
             return false;
         }
 
-        // Step 12 - Subtract checksum from 24 to create check digit
-        $check_digit = $divisor - $rest;
 
-
-        //////////////////////////
-        ///
-        // $check_digit equals what character ?????
-
-        $last_digit = $this->extractLetter($chars[6]);
-
+        // Step 12 - Subtract checksum from 11 to create check digit
+        $check_digit = $divisor-$rest;
 
         // Step 13 - If check digit equals 10 convert to zero
-//        if ($check_digit == 10) {
-//            $check_digit = 0;
-//        }
+        if ($check_digit == 10) {
+            $check_digit = 0;
+        }
 
         // Step 14 - Fourth number must be equal to check digit
-        if ($last_digit != $check_digit) {
+        if ($chars[6] != $check_digit) {
             $validator->validationError(
                 $this->name,
                 _t(

@@ -11,7 +11,7 @@ use SilverStripe\Forms\NullableField;
  *
  * When editing this field, an NHIField will be use.
  *
- * To use thid field on a DataObject:
+ * To use this field on a DataObject:
  * ```php
  * class Patient extends DataObject {
  *
@@ -26,12 +26,11 @@ use SilverStripe\Forms\NullableField;
  */
 class NHI extends DBVarchar
 {
-
     /**
      * Instantiate a new NHI db field.
      * @param $name string The name of the field.
      * @param array  $options Optional parameters, e.g. array("nullifyEmpty"=>false). See
-     *                        {@link StringField::setOptions()} for information on the available options.
+     * {@link StringField::setOptions()} for information on the available options.
      */
     public function __construct($name = null, $options = array())
     {
@@ -46,10 +45,12 @@ class NHI extends DBVarchar
      */
     public function scaffoldFormField($title = null, $params = null)
     {
+        $nhiField = NHIField::create($this->name, $title);
+
         if (!$this->nullifyEmpty) {
-            return new NullableField(new NHIField($this->name, $title));
+            return NullableField::create($nhiField);
         } else {
-            return new NHIField($this->name, $title);
+            return $nhiField;
         }
     }
 }

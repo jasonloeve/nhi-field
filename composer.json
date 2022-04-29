@@ -1,6 +1,6 @@
 {
     "name": "jasonloeve/nhi-field",
-    "description": "Provide a NHI db field and NHI Form field to track NZ's \"National Health Index\" number.",
+    "description": "Custom field to validate both the old (pre july 2022) and new format NZ NHI numbers",
     "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",
@@ -11,10 +11,6 @@
     ],
     "license": "MIT",
     "authors": [
-        {
-            "name": "Maxime Rainville",
-            "email": "maxime@webtorque.co.nz"
-        },
         {
             "name": "Jason Loeve",
             "email": "jason@weareonfire.co.nz",

@@ -56,7 +56,11 @@ class NHIField extends TextField
      */
     public function getHtml5Pattern()
     {
-        return $this->getAttribute('pattern') == self::REGEX_PATTERN;
+        if ($this->standardsCheck() === false) {
+            return $this->getAttribute('pattern') == self::REGEX_PATTERN;
+        }
+
+        return $this->getAttribute('pattern') == self::LEGACY_REGEX_PATTERN;
     }
 
     /**
@@ -67,10 +71,15 @@ class NHIField extends TextField
     public function setHtml5Pattern($enabled)
     {
         if ($enabled) {
-            $this->setAttribute('pattern', self::REGEX_PATTERN);
+            if ($this->standardsCheck() === false) {
+                $this->setAttribute('pattern', self::REGEX_PATTERN);
+            } else {
+                $this->setAttribute('pattern', self::LEGACY_REGEX_PATTERN);
+            }
         } else {
             $this->setAttribute('pattern', '');
         }
+
         return $this;
     }
 
@@ -81,13 +90,11 @@ class NHIField extends TextField
      */
     public function validate($validator)
     {
-
-
         if ($this->standardsCheck() === false) {
             return parent::validate($validator) && $this->formatValidation($validator);
         }
 
-        //return parent::validate($validator) && $this->formatValidation($validator);
+        return parent::validate($validator) && $this->legacyFormatValidation($validator);
     }
 
     /**
@@ -108,6 +115,110 @@ class NHIField extends TextField
      * @return boolean
      */
     protected function formatValidation($validator)
+    {
+        $nhi = $this->value;
+        $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);
+
+        // Step 1 and 2
+        $pattern = "/" . self::REGEX_PATTERN . "/";
+
+        if (!preg_match($pattern, $nhi)) {
+            $validator->validationError(
+                $this->name,
+                _t(
+                    'NHIField.VALIDATEPATTERN',
+                    'The value for {name} must be a sequence of 3 letters followed by 2 digits then 2 more letters.',
+                    array('name' => $this->Title())
+                ),
+                "validation"
+            );
+            return false;
+        }
+
+        // Flag to disable checksum check during testing.
+        if (self::config()->get('disable_checksum_validation')) {
+            return true;
+        }
+
+        // Step 3 - Assign first letter its corresponding value from the Alphabet Conversion Table and multiply value by 7
+        $calc1 = $this->extractLetter($chars[0]) * 7;
+
+        // Step 4 - Assign second letter its corresponding value from the Alphabet Conversion Table and multiply value by 6.
+        $calc2 = $this->extractLetter($chars[1]) * 6;
+
+        // Step 5 - Assign third letter its corresponding value from the Alphabet Conversion Table and multiply value by 5.
+        $calc3 = $this->extractLetter($chars[2]) * 5;
+
+        // Step 6 - Multiply first number by 4
+        $calc4 = $chars[3] * 4;
+
+        // Step 7 - Multiply second number by 3
+        $calc5 = $chars[4] * 3;
+
+        // Step 8 - Multiply third number by 2
+        $calc6 = $this->extractLetter($chars[5]) * 2;
+
+        // Step 9 - Total the result of steps 3 to 8
+        $sum = $calc1 + $calc2 + $calc3 + $calc4 + $calc5 + $calc6;
+
+        // Step 10 - Apply modulus 24 to create a checksum.
+        $divisor = 24;
+        $rest = fmod($sum, $divisor);
+
+        // Step 11 - If checksum is zero then the NHI number is incorrect
+        if ($rest == 0) {
+            $validator->validationError(
+                $this->name,
+                _t(
+                    'NHIField.VALIDATECHECKSUM',
+                    'The value for {name} is not a valid NHI number.',
+                    array('name' => $this->Title())
+                ),
+                "validation"
+            );
+            return false;
+        }
+
+        // Step 12 - Subtract checksum from 24 to create check digit
+        $check_digit = $divisor - $rest;
+
+
+        //////////////////////////
+        ///
+        // $check_digit equals what character ?????
+
+        $last_digit = $this->extractLetter($chars[6]);
+
+
+        // Step 13 - If check digit equals 10 convert to zero
+//        if ($check_digit == 10) {
+//            $check_digit = 0;
+//        }
+
+        // Step 13 - Fourth number must be equal to check digit
+        if ($last_digit != $check_digit) {
+            $validator->validationError(
+                $this->name,
+                _t(
+                    'NHIField.VALIDATECHECKSUM',
+                    'The value for {name} is not a valid NHI number.',
+                    array('name' => $this->Title())
+                ),
+                "validation"
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate the NHI using the 15 steps highlighted in
+     * {@link https://en.wikipedia.org/w/index.php?title=NHI_Number&oldid=770434870}
+     * @param  Validator $validator
+     * @return boolean
+     */
+    protected function legacyFormatValidation($validator)
     {
         $nhi = $this->value;
         $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);

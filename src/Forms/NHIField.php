@@ -221,17 +221,16 @@ class NHIField extends TextField
     protected function legacyFormatValidation($validator)
     {
         $nhi = $this->value;
-        $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);
 
         // Step 1 and 2
-        $pattern = "/" . self::REGEX_PATTERN . "/";
+        $pattern = "/" . self::LEGACY_REGEX_PATTERN . "/";
 
         if (!preg_match($pattern, $nhi)) {
             $validator->validationError(
                 $this->name,
                 _t(
-                    'NHIField.VALIDATEPATTERN',
-                    'The value for {name} must be a sequence of 3 letters followed by 2 digits then 2 more letters.',
+                    'NHIField.LEGACYVALIDATEPATTERN',
+                    'The value for {name} must be a sequence of 3 letters followed by 4 digits.',
                     array('name' => $this->Title())
                 ),
                 "validation"
@@ -244,29 +243,31 @@ class NHIField extends TextField
             return true;
         }
 
+        $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);
+
         // Step 3 - Assign first letter its corresponding value from the Alphabet Conversion Table and multiply value by 7
-        $calc1 = $this->extractLetter($chars[0]) * 7;
+        $calc1 = $this->extractLetter($chars[0])*7;
 
         // Step 4 - Assign second letter its corresponding value from the Alphabet Conversion Table and multiply value by 6.
-        $calc2 = $this->extractLetter($chars[1]) * 6;
+        $calc2 = $this->extractLetter($chars[1])*6;
 
         // Step 5 - Assign third letter its corresponding value from the Alphabet Conversion Table and multiply value by 5.
-        $calc3 = $this->extractLetter($chars[2]) * 5;
+        $calc3 = $this->extractLetter($chars[2])*5;
 
         // Step 6 - Multiply first number by 4
-        $calc4 = $chars[3] * 4;
+        $calc4 = $chars[3]*4;
 
         // Step 7 - Multiply second number by 3
-        $calc5 = $chars[4] * 3;
+        $calc5 = $chars[4]*3;
 
         // Step 8 - Multiply third number by 2
-        $calc6 = $this->extractLetter($chars[5]) * 2;
+        $calc6 = $chars[5]*2;
 
         // Step 9 - Total the result of steps 3 to 8
         $sum = $calc1 + $calc2 + $calc3 + $calc4 + $calc5 + $calc6;
 
-        // Step 10 - Apply modulus 24 to create a checksum.
-        $divisor = 24;
+        // Step 10 - Apply modulus 11 to create a checksum.
+        $divisor = 11;
         $rest = fmod($sum, $divisor);
 
         // Step 11 - If checksum is zero then the NHI number is incorrect
@@ -283,24 +284,17 @@ class NHIField extends TextField
             return false;
         }
 
-        // Step 12 - Subtract checksum from 24 to create check digit
+
+        // Step 12 - Subtract checksum from 11 to create check digit
         $check_digit = $divisor - $rest;
 
-
-        //////////////////////////
-        ///
-        // $check_digit equals what character ?????
-
-        $last_digit = $this->extractLetter($chars[6]);
-
-
         // Step 13 - If check digit equals 10 convert to zero
-//        if ($check_digit == 10) {
-//            $check_digit = 0;
-//        }
+        if ($check_digit == 10) {
+            $check_digit = 0;
+        }
 
-        // Step 13 - Fourth number must be equal to check digit
-        if ($last_digit != $check_digit) {
+        // Step 14 - Fourth number must be equal to check digit
+        if ($chars[6] != $check_digit) {
             $validator->validationError(
                 $this->name,
                 _t(

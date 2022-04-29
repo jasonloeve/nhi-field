@@ -82,10 +82,10 @@ class NHIField extends TextField
     public function validate($validator)
     {
 
-        return parent::validate($validator) && $this->formatValidation($validator);
-//        if ($this->standardsCheck() == false) {
-//
-//        }
+
+        if ($this->standardsCheck() === false) {
+            return parent::validate($validator) && $this->formatValidation($validator);
+        }
 
         //return parent::validate($validator) && $this->formatValidation($validator);
     }

@@ -35,7 +35,7 @@ class NHIField extends TextField
     public function __construct($name, $title = null, $value = '', $form = null, $html5pattern = false)
     {
         parent::__construct($name, $title, $value, 7, $form);
-        //$this->setHtml5Pattern($html5pattern);
+        $this->setHtml5Pattern($html5pattern);
     }
 
     public function standardsCheck()
@@ -54,30 +54,25 @@ class NHIField extends TextField
      * Get whatever to output the `pattern` attribute on the input tag.
      * @return boolean
      */
-//    public function getHtml5Pattern()
-//    {
-//        if ($this->standardsCheck() == true) {
-//
-//        }
-//
-//
-//        return $this->getAttribute('pattern') == self::REGEX_PATTERN;
-//    }
+    public function getHtml5Pattern()
+    {
+        return $this->getAttribute('pattern') == self::REGEX_PATTERN;
+    }
 
     /**
      * Set whatever to output the `pattern` attribute on the input tag.
      * @param  boolean $enabled Enable or disable the pattern.
      * @return NHIField
      */
-//    public function setHtml5Pattern($enabled)
-//    {
-//        if ($enabled) {
-//            $this->setAttribute('pattern', self::REGEX_PATTERN);
-//        } else {
-//            $this->setAttribute('pattern', '');
-//        }
-//        return $this;
-//    }
+    public function setHtml5Pattern($enabled)
+    {
+        if ($enabled) {
+            $this->setAttribute('pattern', self::REGEX_PATTERN);
+        } else {
+            $this->setAttribute('pattern', '');
+        }
+        return $this;
+    }
 
     /**
      * @inheritDoc

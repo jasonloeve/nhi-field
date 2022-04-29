@@ -18,6 +18,7 @@ class NHIField extends TextField
      * Regular expression to validate an NHI.
      * @var string
      */
+    const LEGACY_REGEX_PATTERN = '^[a-zA-Z]{3}[0-9]{4}$'; // Pre 2022 pattern
     const REGEX_PATTERN = '^[a-zA-Z]{3}[0-9]{2}[a-zA-Z]{2}$'; // Regex pattern to follow July 2022 standards
 
     // Make sure we apply the text class to the field, so it displays like a normal text field in the CMS.
@@ -31,35 +32,52 @@ class NHIField extends TextField
      * @param Form   $form          Form to add the field to.
      * @param bool   $html5pattern  Output a pattern attribute on the input.
      */
-    public function __construct($name, $title = null, $value = '', $form = null, $html5pattern=false)
+    public function __construct($name, $title = null, $value = '', $form = null, $html5pattern = false)
     {
         parent::__construct($name, $title, $value, 7, $form);
-        $this->setHtml5Pattern($html5pattern);
+        //$this->setHtml5Pattern($html5pattern);
+    }
+
+    public function standardsCheck()
+    {
+        $nhi = $this->value;
+        $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (is_numeric($chars[5])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * Get whatever to output the `pattern` attribute on the input tag.
      * @return boolean
      */
-    public function getHtml5Pattern()
-    {
-        return $this->getAttribute('pattern') == self::REGEX_PATTERN;
-    }
+//    public function getHtml5Pattern()
+//    {
+//        if ($this->standardsCheck() == true) {
+//
+//        }
+//
+//
+//        return $this->getAttribute('pattern') == self::REGEX_PATTERN;
+//    }
 
     /**
      * Set whatever to output the `pattern` attribute on the input tag.
      * @param  boolean $enabled Enable or disable the pattern.
      * @return NHIField
      */
-    public function setHtml5Pattern($enabled)
-    {
-        if ($enabled) {
-            $this->setAttribute('pattern', self::REGEX_PATTERN);
-        } else {
-            $this->setAttribute('pattern', '');
-        }
-        return $this;
-    }
+//    public function setHtml5Pattern($enabled)
+//    {
+//        if ($enabled) {
+//            $this->setAttribute('pattern', self::REGEX_PATTERN);
+//        } else {
+//            $this->setAttribute('pattern', '');
+//        }
+//        return $this;
+//    }
 
     /**
      * @inheritDoc
@@ -68,7 +86,12 @@ class NHIField extends TextField
      */
     public function validate($validator)
     {
-        return parent::validate($validator) && $this->formatValidation($validator);
+
+        if ($this->standardsCheck() == true) {
+            var_dump($this->standardsCheck()); die();
+        }
+
+        //return parent::validate($validator) && $this->formatValidation($validator);
     }
 
     /**
@@ -91,6 +114,7 @@ class NHIField extends TextField
     protected function formatValidation($validator)
     {
         $nhi = $this->value;
+        $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);
 
         // Step 1 and 2
         $pattern = "/" . self::REGEX_PATTERN . "/";
@@ -113,25 +137,23 @@ class NHIField extends TextField
             return true;
         }
 
-        $chars = preg_split('//', $nhi, -1, PREG_SPLIT_NO_EMPTY);
-
         // Step 3 - Assign first letter its corresponding value from the Alphabet Conversion Table and multiply value by 7
-        $calc1 = $this->extractLetter($chars[0])*7;
+        $calc1 = $this->extractLetter($chars[0]) * 7;
 
         // Step 4 - Assign second letter its corresponding value from the Alphabet Conversion Table and multiply value by 6.
-        $calc2 = $this->extractLetter($chars[1])*6;
+        $calc2 = $this->extractLetter($chars[1]) * 6;
 
         // Step 5 - Assign third letter its corresponding value from the Alphabet Conversion Table and multiply value by 5.
-        $calc3 = $this->extractLetter($chars[2])*5;
+        $calc3 = $this->extractLetter($chars[2]) * 5;
 
         // Step 6 - Multiply first number by 4
-        $calc4 = $chars[3]*4;
+        $calc4 = $chars[3] * 4;
 
         // Step 7 - Multiply second number by 3
-        $calc5 = $chars[4]*3;
+        $calc5 = $chars[4] * 3;
 
         // Step 8 - Multiply third number by 2
-        $calc6 = $this->extractLetter($chars[5])*2;
+        $calc6 = $this->extractLetter($chars[5]) * 2;
 
         // Step 9 - Total the result of steps 3 to 8
         $sum = $calc1 + $calc2 + $calc3 + $calc4 + $calc5 + $calc6;

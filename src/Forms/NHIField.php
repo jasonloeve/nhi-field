@@ -169,7 +169,7 @@ class NHIField extends TextField
         $check_digit = $divisor - $rest;
 
         // Step 12 - If checksum is zero then the NHI number is incorrect
-        if ($check_digit == 0) {
+        if ($check_digit === 0) {
             $validator->validationError(
                 $this->name,
                 _t(

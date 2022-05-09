@@ -165,37 +165,12 @@ class NHIField extends TextField
         $divisor = 24;
         $rest = fmod($sum, $divisor);
 
-        // Step 11 - If checksum is zero then the NHI number is incorrect
-        if ($rest == 0) {
-            $validator->validationError(
-                $this->name,
-                _t(
-                    'NHIField.VALIDATECHECKSUM',
-                    'The value for {name} is not a valid NHI number.',
-                    array('name' => $this->Title())
-                ),
-                "validation"
-            );
-            return false;
-        }
-
-        // Step 12 - Subtract checksum from 24 to create check digit
+        // Step 11 - Subtract checksum from 24 to create check digit
         $check_digit = $divisor - $rest;
 
-
-        //////////////////////////
-        ///
-        // $check_digit equals what character ?????
-
+        // Step 12 - Fourth number must be equal to check digit
         $last_digit = $this->extractLetter($chars[6]);
 
-
-        // Step 13 - If check digit equals 10 convert to zero
-//        if ($check_digit == 10) {
-//            $check_digit = 0;
-//        }
-
-        // Step 13 - Fourth number must be equal to check digit
         if ($last_digit != $check_digit) {
             $validator->validationError(
                 $this->name,

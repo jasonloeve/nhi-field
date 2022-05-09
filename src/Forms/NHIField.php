@@ -168,7 +168,21 @@ class NHIField extends TextField
         // Step 11 - Subtract checksum from 24 to create check digit
         $check_digit = $divisor - $rest;
 
-        // Step 12 - Fourth number must be equal to check digit
+        // Step 12 - If checksum is zero then the NHI number is incorrect
+        if ($check_digit == 0) {
+            $validator->validationError(
+                $this->name,
+                _t(
+                    'NHIField.VALIDATECHECKSUM',
+                    'The value for {name} is not a valid NHI number.',
+                    array('name' => $this->Title())
+                ),
+                "validation"
+            );
+            return false;
+        }
+
+        // Step 13 - Fourth number must be equal to check digit
         $last_digit = $this->extractLetter($chars[6]);
 
         if ($last_digit != $check_digit) {
